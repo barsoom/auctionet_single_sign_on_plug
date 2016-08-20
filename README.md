@@ -6,7 +6,23 @@ A library to add user authentication though Auctionet Admin SSO to phoenix apps.
 
 ### mix.exs
 
-Set up the dependency like we've done in [mix.exs](https://github.com/barsoom/phoenix_sso_example/blob/master/mix.exs)
+Add this to deps:
+
+     {:auctionet_single_sign_on_plug, ">= 0.0.0", git: github_url("barsoom/auctionet_single_sign_on_plug")},
+
+And below add this (will be needed later):
+
+```
+  defp github_url(path) do
+    if System.get_env("MIX_ENV") == "prod" do
+      "https://github.com/#{path}.git"
+    else
+      "git@github.com:#{path}"
+    end
+  end
+```
+
+Run `mix deps.get`
 
 ### dev.exs
 
