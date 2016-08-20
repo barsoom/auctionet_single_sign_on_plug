@@ -86,7 +86,7 @@ Since this is a private project it's more complex to access. Circle has a way to
 - Set heroku config for `GITHUB_AUTH_TOKEN` (auctionet_push has the right one) and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack like this `heroku buildpacks:add -i 1 https://github.com/timshadel/heroku-buildpack-github-netrc.git` (needed to install this plug from a private repo).
 - Set heroku configs for `SSO_SECRET_KEY` (pwgen -n 255), `SSO_REQUEST_URL`, and `SSO_LOGOUT_URL` (see auctionet_push config).
 
-## Push the code and make sure it's deploy, then:
+## Push the code and make sure it's deployed, then:
 
 Create a SingleSignOnApplication record in auctionet. Leave entitlements an empty array if only supers will use it.
 
