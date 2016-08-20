@@ -92,6 +92,8 @@ Create a SingleSignOnApplication record in auctionet. Leave entitlements an empt
 
 Log in and out of auctionet admin and check that the SSO works.
 
+Link to the app from Auctionet Admin.
+
 Done!
 
 ### prod.exs
