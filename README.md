@@ -16,7 +16,7 @@ And below add this (will be needed later):
 
 ```
   defp github_url(path) do
-    if System.get_env("MIX_ENV") == "prod" || System.get_env("CIRCLECI") do
+    if System.get_env("MIX_ENV") == "prod" do
       "https://github.com/#{path}.git"
     else
       "git@github.com:#{path}"
@@ -71,6 +71,14 @@ Visit the app in development and see if it authenticates with auctionet.dev.
 If it works you will be returned to "/" on your app rendered by `PageController`. This means you're authenticated. Check `conn.assigns[:sso]` for user data!
 
 Logging out from <http://auctionet.dev/admin> should log you out from the app (a background job in auctionet makes a call to the app in the background). Going to the app and logging in again should return you to the app with `conn.assigns[:sso]` set.
+
+## CircleCI
+
+Since this is a private project it's more complex to access. Circle has a way to give access, but as far as I can see that gives access to all __your__ private repos. So better to use that feature on the auctionet-ci user.
+
+0. Give the [auctionet-ci-team](https://github.com/orgs/barsoom/teams/auctionet-ci/repositories) admin access to the app repo and read access to this repo.
+0. Log into github as auctionet-ci (in another browser), go to circle, log in there, go to project settings, checkout ssh keys, authorize and add a key for auctionet-ci.
+0. Trigger the build and it should work.
 
 ## Deploying to heroku
 
