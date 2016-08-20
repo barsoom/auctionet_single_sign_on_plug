@@ -8,7 +8,7 @@ A library to add user authentication though Auctionet Admin SSO to phoenix apps.
 
 Set up the dependency like we've done in [mix.exs](https://github.com/barsoom/phoenix_sso_example/blob/master/mix.exs)
 
-#### dev.exs
+### dev.exs
 
 Remember to change "your_app_name".
 
@@ -19,7 +19,7 @@ config :phoenix_sso_example,
   sso_logout_url: "http://auctionet.dev/admin/logout/sso"
 ```
 
-#### router.ex
+### router.ex
 
 ```
   pipeline :require_valid_sso_login do
@@ -38,11 +38,11 @@ config :phoenix_sso_example,
 
 If you want some paths not to require SSO, create a different scope for those.
 
-### Auctionet setup
+### Setup the app in auctionet
 
 Ensure you have created a `SingleSignOnApplication` record in auctionet dev that matches this app. The `sso_login_url` should be something like `http://192.168.50.1:4000/` (does not need to be "/" but needs to be a path that is controlled by this plug).
 
-### Trying it out
+### Try it out
 
 Visit the app in development and see if it authenticates with auctionet.dev.
 
