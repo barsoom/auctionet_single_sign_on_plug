@@ -11,7 +11,7 @@ defmodule AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory do
   def active_sso_session_ids_and_data(nil), do: {[], nil}
   def active_sso_session_ids_and_data(sso_employee_id) do
     Agent.get agent, fn (state) ->
-      Map.get(state, sso_employee_id)
+      Map.get(state, sso_employee_id) || {[], nil}
     end
   end
 

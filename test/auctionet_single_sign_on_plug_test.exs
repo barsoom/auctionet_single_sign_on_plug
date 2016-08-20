@@ -94,6 +94,22 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert get_session(conn, :sso_employee_id) == nil
   end
 
+  test "a regular page load clears everything and requests a new sso session if session info was lost" do
+    conn = conn(:get, "/")
+    |> set_up_session
+    |> put_session(:sso_session_id, "abc123")
+    |> put_session(:sso_employee_id, 100)
+
+    # cookies exist, but no state (e.g. after server restart)
+
+    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+
+    assert conn.status == 302 # redirect
+    assert conn.assigns[:sso] == nil
+    assert get_session(conn, :sso_session_id) == nil
+    assert get_session(conn, :sso_employee_id) == nil
+  end
+
   test "a regular page requests a sso session when none exists" do
     conn = conn(:get, "/")
     |> set_up_session
