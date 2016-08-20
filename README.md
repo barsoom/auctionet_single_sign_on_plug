@@ -2,6 +2,8 @@
 
 A library to add user authentication though Auctionet Admin SSO to phoenix apps.
 
+See it in action in the [example app on heroku](https://auctionet-phoenix-sso-example.herokuapp.com).
+
 ## How to get started in dev in a phoenix app
 
 ### mix.exs
