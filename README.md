@@ -41,9 +41,7 @@ config :phoenix_sso_example,
   end
 ```
 
-You can also set `sso_session_persister` to something else, but only do that after you get SSO to work without it.
-
-If you want some paths not to require SSO, create a different pipeline for those.
+If you want some paths not to require SSO, create a different scope for those.
 
 ### Auctionet setup
 
@@ -72,3 +70,5 @@ config :phoenix_sso_example,
 #### More info
 
 If something doesn't work, check how it's done in [phoenix_sso_example](https://github.com/barsoom/phoenix_sso_example).
+
+The example app also persists it's sessions as User records in a postgres database. That's way sessions remain across app restarts and you can use the User records for other things.
