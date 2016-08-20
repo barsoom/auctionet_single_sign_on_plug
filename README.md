@@ -92,7 +92,7 @@ Since this is a private project it's more complex to access. Circle has a way to
 ### prod.exs
 
 ```
-config :phoenix_sso_example,
+config :your_app_name,
   sso_secret_key: System.get_env("SSO_SECRET_KEY"),
   sso_request_url: System.get_env("SSO_REQUEST_URL"),
   sso_logout_url: System.get_env("SSO_LOGOUT_URL")
