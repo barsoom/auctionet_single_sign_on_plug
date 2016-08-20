@@ -42,11 +42,17 @@ If you want some paths not to require SSO, create a different scope for those.
 
 Ensure you have created a `SingleSignOnApplication` record in auctionet dev that matches this app. The `sso_login_url` should be something like `http://192.168.50.1:4000/` (does not need to be "/" but needs to be a path that is controlled by this plug).
 
+### Start servers in auctionet
+
+Start `foreman start -f Procfile.sso` and `dev web` in /projects/auctionet.
+
 ### Try it out
 
 Visit the app in development and see if it authenticates with auctionet.dev.
 
-If it works you will see "/" on your app rendered by `PageController`. This means you're authenticated. Check `conn.assigns[:sso]` for user data!
+If it works you will be returned to "/" on your app rendered by `PageController`. This means you're authenticated. Check `conn.assigns[:sso]` for user data!
+
+Logging out from <http://auctionet.dev/admin> should log you out from the app (a background job in auctionet makes a call to the app in the background). Going to the app and logging in again should return you to the app with `conn.assigns[:sso]` set.
 
 ## Deploying to heroku
 
