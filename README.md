@@ -78,11 +78,12 @@ Since this is a private project it's more complex to access. Circle has a way to
 
 0. Give the [auctionet-ci-team](https://github.com/orgs/barsoom/teams/auctionet-ci/repositories) admin access to the app repo and read access to this repo.
 0. Log into github as auctionet-ci (in another browser), go to circle, log in there, go to project settings, checkout ssh keys, authorize and add a key for auctionet-ci.
+0. Then change from admin to read access again.
 0. Trigger the build and it should work.
 
 ## Deploying to heroku
 
-- Set heroku config for `GITHUB_AUTH_TOKEN` and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack (needed to install this plug from a private repo).
+- Set heroku config for `GITHUB_AUTH_TOKEN` (auctionet_push has the right one) and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack (needed to install this plug from a private repo).
 - Set heroku configs for `SSO_SECRET_KEY`, `SSO_REQUEST_URL`, and `SSO_LOGOUT_URL`.
 
 ### prod.exs
