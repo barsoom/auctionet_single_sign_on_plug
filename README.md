@@ -79,14 +79,20 @@ Since this is a private project it's more complex to access. Circle has a way to
 0. Give the [auctionet-ci-team](https://github.com/orgs/barsoom/teams/auctionet-ci/repositories) admin access to the app repo and read access to this repo.
 0. Log into github as auctionet-ci (in another browser), go to circle, log in there, go to project settings, checkout ssh keys, authorize and add a key for auctionet-ci.
 0. Then change from admin to read access again.
-0. Trigger the build and it should work.
+0. Don't trigger the build yet.
 
 ## Deploying to heroku
 
 - Set heroku config for `GITHUB_AUTH_TOKEN` (auctionet_push has the right one) and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack like this `heroku buildpacks:add -i 1 https://github.com/timshadel/heroku-buildpack-github-netrc.git` (needed to install this plug from a private repo).
 - Set heroku configs for `SSO_SECRET_KEY` (pwgen -n 255), `SSO_REQUEST_URL`, and `SSO_LOGOUT_URL` (see auctionet_push config).
 
-Don't forget to also create a SingleSignOnApplication record in auctionet. Leave entitlements an empty array if only supers will use it.
+## Push the code and make sure it's deploy, then:
+
+Create a SingleSignOnApplication record in auctionet. Leave entitlements an empty array if only supers will use it.
+
+Log in and out of auctionet admin and check that the SSO works.
+
+Done!
 
 ### prod.exs
 
