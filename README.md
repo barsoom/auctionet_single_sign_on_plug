@@ -89,6 +89,15 @@ Since this is a private project it's more complex to access. Circle has a way to
 - Set heroku configs for `SSO_SECRET_KEY` (pwgen -n 255), `SSO_REQUEST_URL`, and `SSO_LOGOUT_URL` (see auctionet_push config).
 - In elixir_buildpack.config, add "SSO_SECRET_KEY SSO_REQUEST_URL" to config_vars_to_export, so that it at least has `config_vars_to_export=(SSO_SECRET_KEY SSO_REQUEST_URL)`.
 
+### prod.exs
+
+```
+config :phoenix_sso_example,
+  sso_secret_key: System.get_env("SSO_SECRET_KEY"),
+  sso_request_url: System.get_env("SSO_REQUEST_URL"),
+  sso_logout_url: System.get_env("SSO_LOGOUT_URL")
+```
+
 ## Push the code and make sure it's deployed, then:
 
 Create a SingleSignOnApplication record in auctionet. Leave entitlements an empty array if only supers will use it.
@@ -98,15 +107,6 @@ Log in and out of auctionet admin and check that the SSO works.
 Link to the app from Auctionet Admin.
 
 Done!
-
-### prod.exs
-
-```
-config :phoenix_sso_example,
-  sso_secret_key: System.get_env("SSO_SECRET_KEY"),
-  sso_request_url: System.get_env("SSO_REQUEST_URL"),
-  sso_logout_url: System.get_env("SSO_LOGOUT_URL")
-```
 
 ### More info
 
