@@ -88,4 +88,4 @@ config :phoenix_sso_example,
 
 If something doesn't work, check how it's done in [phoenix_sso_example](https://github.com/barsoom/phoenix_sso_example).
 
-The example app also persists it's sessions as User records in a postgres database. That way sessions remain across app restarts and you can use the User records for other things.
+The [example app](https://auctionet-phoenix-sso-example.herokuapp.com) also persists it's sessions as User records in a postgres database. That way sessions remain across app restarts and you can use the User records for other things.
