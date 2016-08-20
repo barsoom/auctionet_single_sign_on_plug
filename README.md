@@ -56,7 +56,7 @@ Logging out from <http://auctionet.dev/admin> should log you out from the app (a
 
 ## Deploying to heroku
 
-- Set heroku config for `GITHUB_AUTH_TOKEN` and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack.
+- Set heroku config for `GITHUB_AUTH_TOKEN` and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack (needed to install this plug from a private repo).
 - Set heroku configs for `SSO_SECRET_KEY`, `SSO_REQUEST_URL`, and `SSO_LOGOUT_URL`.
 
 ### prod.exs
