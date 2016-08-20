@@ -36,9 +36,11 @@ In the bottom of "pipeline :browser do", add:
 
 You can also set `sso_session_persister` to something else, but only do that after you get SSO to work without it.
 
+If you want some paths not to require SSO, create a different pipeline for those.
+
 ### Auctionet setup
 
-Ensure you have created a `SingleSignOnApplication` record in auctionet dev that matches this app. The `sso_login_url` should be something like `http://192.168.50.1:4000`.
+Ensure you have created a `SingleSignOnApplication` record in auctionet dev that matches this app. The `sso_login_url` should be something like `http://192.168.50.1:4000/` (does not need to be "/" but needs to be a path that is controlled by this plug).
 
 ### Trying it out
 
