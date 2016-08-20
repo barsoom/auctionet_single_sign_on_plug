@@ -25,6 +25,8 @@ defmodule AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory do
     Agent.update agent, fn (state) ->
       if state[sso_employee_id] do
         Map.put(state, sso_employee_id, {active_sso_session_ids, data})
+      else
+        state
       end
     end
   end
