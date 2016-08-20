@@ -4,9 +4,9 @@ A library to add user authentication though Auctionet Admin SSO to phoenix apps.
 
 ## How to get started in dev in a phoenix app
 
-### Basic setup
+### mix.exs
 
-- Set up the dependency like we've done in [mix.exs](https://github.com/barsoom/phoenix_sso_example/blob/master/mix.exs)
+Set up the dependency like we've done in [mix.exs](https://github.com/barsoom/phoenix_sso_example/blob/master/mix.exs)
 
 #### dev.exs
 
