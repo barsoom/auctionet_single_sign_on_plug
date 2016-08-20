@@ -16,7 +16,7 @@ And below add this (will be needed later):
 
 ```
   defp github_url(path) do
-    if System.get_env("MIX_ENV") == "prod" do
+    if System.get_env("MIX_ENV") == "prod" || System.get_env("CIRCLECI") do
       "https://github.com/#{path}.git"
     else
       "git@github.com:#{path}"
