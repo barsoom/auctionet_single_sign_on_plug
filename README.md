@@ -31,7 +31,7 @@ Run `mix deps.get`
 Remember to change "your_app_name".
 
 ```
-config :phoenix_sso_example,
+config :your_app_name,
   sso_secret_key: "dev secretdev secretdev secretdev secretdev secretdev secretdev secretdev secretdev secretdev secret",
   sso_request_url: "http://auctionet.dev/admin/login/request_sso?app=your_app_name",
   sso_logout_url: "http://auctionet.dev/admin/logout/sso"
@@ -42,8 +42,8 @@ config :phoenix_sso_example,
 ```
   pipeline :require_valid_sso_login do
     plug AuctionetSingleSignOnPlug,
-      sso_secret_key: Application.get_env(:phoenix_sso_example, :sso_secret_key),
-      sso_request_url: Application.get_env(:phoenix_sso_example, :sso_request_url)
+      sso_secret_key: Application.get_env(:your_app_name, :sso_secret_key),
+      sso_request_url: Application.get_env(:your_app_name, :sso_request_url)
   end
 
   scope "/", MyAppName do
