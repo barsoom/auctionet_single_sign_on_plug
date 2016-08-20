@@ -83,7 +83,7 @@ Since this is a private project it's more complex to access. Circle has a way to
 
 ## Deploying to heroku
 
-- Set heroku config for `GITHUB_AUTH_TOKEN` (auctionet_push has the right one) and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack (needed to install this plug from a private repo).
+- Set heroku config for `GITHUB_AUTH_TOKEN` (auctionet_push has the right one) and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack like this `heroku buildpacks:add -i 1 https://github.com/timshadel/heroku-buildpack-github-netrc.git` (needed to install this plug from a private repo).
 - Set heroku configs for `SSO_SECRET_KEY`, `SSO_REQUEST_URL`, and `SSO_LOGOUT_URL`.
 
 ### prod.exs
