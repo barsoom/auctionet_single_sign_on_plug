@@ -1,6 +1,6 @@
 # AuctionetSingleSignOnPlug
 
-Makes it easy to add user authentication though Auctionet Admin SSO like we do with bookie to phoenix apps.
+A library to add user authentication though Auctionet Admin SSO to phoenix apps.
 
 ## How to get started in dev in a phoenix app
 
