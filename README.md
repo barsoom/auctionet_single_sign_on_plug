@@ -53,7 +53,7 @@ If it works you will see "/" on your app rendered by `PageController`. This mean
 - Set heroku config for `GITHUB_AUTH_TOKEN` and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack.
 - Set heroku configs for `SSO_SECRET_KEY`, `SSO_REQUEST_URL`, and `SSO_LOGOUT_URL`.
 
-#### prod.exs
+### prod.exs
 
 ```
 config :phoenix_sso_example,
@@ -62,7 +62,7 @@ config :phoenix_sso_example,
   sso_logout_url: System.get_env("SSO_LOGOUT_URL")
 ```
 
-#### More info
+### More info
 
 If something doesn't work, check how it's done in [phoenix_sso_example](https://github.com/barsoom/phoenix_sso_example).
 
