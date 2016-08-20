@@ -36,9 +36,11 @@ In the bottom of "pipeline :browser do", add:
 
 You can also set `sso_session_persister` to something else, but only do that after you get SSO to work without it.
 
-#### Trying it out
+### Auctionet setup
 
-Ensure you have created a SingleSignOnApplication record in auctionet dev that matches this app. The `sso_logout_url` should be something like `http://192.168.50.1:4000`.
+Ensure you have created a `SingleSignOnApplication` record in auctionet dev that matches this app. The `sso_logout_url` should be something like `http://192.168.50.1:4000`.
+
+### Trying it out
 
 Visit the app in development and see if it authenticates with auctionet.dev.
 
