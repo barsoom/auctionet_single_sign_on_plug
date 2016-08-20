@@ -26,12 +26,19 @@ config :phoenix_sso_example,
 
 #### router.ex
 
-In the bottom of "pipeline :browser do", add:
-
 ```
-  plug AuctionetSingleSignOnPlug,
-    sso_secret_key: Application.get_env(:phoenix_sso_example, :sso_secret_key),
-    sso_request_url: Application.get_env(:phoenix_sso_example, :sso_request_url)
+  pipeline :require_valid_sso_login do
+    plug AuctionetSingleSignOnPlug,
+      sso_secret_key: Application.get_env(:phoenix_sso_example, :sso_secret_key),
+      sso_request_url: Application.get_env(:phoenix_sso_example, :sso_request_url)
+  end
+
+  scope "/", MyAppName do
+    # pipe_through :browser                           # <- replace this
+    pipe_through [:browser, :require_valid_sso_login] # <- with this!
+
+    # ...
+  end
 ```
 
 You can also set `sso_session_persister` to something else, but only do that after you get SSO to work without it.
