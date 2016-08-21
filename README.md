@@ -98,7 +98,7 @@ config :your_app_name,
   sso_logout_url: System.get_env("SSO_LOGOUT_URL")
 ```
 
-## Push the code and make sure it's deployed, then:
+### Push the code and make sure it's deployed, then:
 
 Create a SingleSignOnApplication record in auctionet. Leave entitlements an empty array if only supers will use it.
 
