@@ -106,6 +106,8 @@ Log in and out of auctionet admin and check that the SSO works.
 
 Link to the app from Auctionet Admin.
 
+Add the SSO header [like in the example app](https://github.com/barsoom/phoenix_sso_example/blob/master/web/templates/layout/app.html.eex#L15) so the user know that the login is part of Auctionet Admin, etc.
+
 Done!
 
 ### More info
