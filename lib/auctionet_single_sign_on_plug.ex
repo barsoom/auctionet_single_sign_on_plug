@@ -39,28 +39,42 @@ defmodule AuctionetSingleSignOnPlug do
       raise "Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data."
     end
 
-    data.payload
+    if data[:protocol_version] == 2 do
+      data
+    else
+      payload = data.payload
+
+      %{
+        action: payload.action,
+        user: Map.merge(payload.profile, %{
+          active_session_ids: payload.known_session_ids,
+          session_id: payload.session_id,
+        })
+      }
+    end
   end
 
   defp respond_to_sso(data, conn, options) do
+    user = data.user
+
     if data[:action] == "log_in" do
-      sso_employee_id = data.profile.external_id
-      active_sso_session_ids = data.known_session_ids
+      sso_employee_id = user.external_id
+      active_sso_session_ids = user.active_session_ids
 
       options[:sso_session_persister].create_or_update(sso_employee_id, active_sso_session_ids, data)
 
       conn
-      |> put_session(:sso_session_id, data.session_id)
+      |> put_session(:sso_session_id, user.session_id)
       |> put_session(:sso_employee_id, sso_employee_id)
       |> Plug.Conn.put_resp_header("location", "/")
       |> Plug.Conn.resp(302, "Logged in")
       |> Plug.Conn.halt
     else
       if data[:action] == "update" do
-        sso_employee_id = data.profile.external_id
-        active_sso_session_ids = data.known_session_ids
+        sso_employee_id = user.external_id
+        active_sso_session_ids = user.active_session_ids
 
-        options[:sso_session_persister].update_if_exists(sso_employee_id, active_sso_session_ids, data)
+        options[:sso_session_persister].update_if_exists(sso_employee_id, active_sso_session_ids, user)
 
         conn
         |> Plug.Conn.resp(200, "ok")
