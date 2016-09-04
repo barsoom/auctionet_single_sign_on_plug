@@ -46,6 +46,7 @@ defmodule AuctionetSingleSignOnPlug do
 
       %{
         action: payload.action,
+        protocol_version: 1,
         user: Map.merge(payload.profile, %{
           active_session_ids: payload.known_session_ids,
           session_id: payload.session_id,
