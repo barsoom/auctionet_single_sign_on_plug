@@ -11,31 +11,12 @@ defmodule AuctionetSingleSignOnPlugTest do
     signing_salt: "salt"
   )
 
-  test "supports the legacy protocol version" do
-    unix_time = :os.system_time(:seconds)
-    profile = %{ external_id: 100 }
-    payload = %{ known_session_ids: [ "abc123" ], session_id: "abc123", action: "log_in", profile: profile }
-    token = JsonWebToken.sign(%{ payload: payload, exp: unix_time + 2 }, %{ key: @key })
-
-    conn = conn(:get, "/", payload: token, source: "auctionet_admin_sso")
-      |> set_up_session
-
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
-
-    assert conn.status == 302 # redirect
-    assert get_session(conn, :sso_session_id) == "abc123"
-    assert get_session(conn, :sso_employee_id) == 100
-
-    {active_sso_session_ids, _data} = AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory.active_sso_session_ids_and_data(100)
-    assert "abc123" in active_sso_session_ids
-  end
-
   test "a log_in event persists the session and redirects" do
     unix_time = :os.system_time(:seconds)
     user = %{ external_id: 100, active_session_ids: [ "abc123" ], session_id: "abc123", action: "log_in" }
-    token = JsonWebToken.sign(%{ action: "log_in", user: user, protocol_version: 2, exp: unix_time + 2 }, %{ key: @key })
+    token = JsonWebToken.sign(%{ action: "log_in", user: user, protocol_version: 3, exp: unix_time + 2 }, %{ key: @key })
 
-    conn = conn(:get, "/", payload: token, source: "auctionet_admin_sso")
+    conn = conn(:get, "/", jwt_authentication_token: token)
       |> set_up_session
 
     conn = AuctionetSingleSignOnPlug.call(conn, @opts)
@@ -51,9 +32,9 @@ defmodule AuctionetSingleSignOnPlugTest do
   test "a update event persists the session change and responds with an ok" do
     unix_time = :os.system_time(:seconds)
     user = %{ active_session_ids: [ "abc123", "eee555" ], session_id: "abc123", action: "update", external_id: 100 }
-    token = JsonWebToken.sign(%{ action: "update", protocol_version: 2, user: user, exp: unix_time + 2 }, %{ key: @key })
+    token = JsonWebToken.sign(%{ action: "update", protocol_version: 3, user: user, exp: unix_time + 2 }, %{ key: @key })
 
-    conn = conn(:get, "/", payload: token, source: "auctionet_admin_sso")
+    conn = conn(:get, "/", jwt_authentication_token: token)
       |> set_up_session
 
     AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory.create_or_update(100, [ "abc123" ], %{})
@@ -70,9 +51,9 @@ defmodule AuctionetSingleSignOnPlugTest do
   test "a unknown event raises an error" do
     unix_time = :os.system_time(:seconds)
 
-    token = JsonWebToken.sign(%{ action: "jump", user: %{}, protocol_version: 2, exp: unix_time + 2 }, %{ key: @key })
+    token = JsonWebToken.sign(%{ action: "jump", user: %{}, protocol_version: 3, exp: unix_time + 2 }, %{ key: @key })
 
-    conn = conn(:get, "/", payload: token, source: "auctionet_admin_sso")
+    conn = conn(:get, "/", jwt_authentication_token: token)
       |> set_up_session
 
     assert_raise RuntimeError, ~r/Unknown action: jump/, fn ->
@@ -143,7 +124,7 @@ defmodule AuctionetSingleSignOnPlugTest do
     unix_time = :os.system_time(:seconds)
     payload = JsonWebToken.sign(%{ payload: %{ app: "data" }, exp: unix_time - 1 }, %{ key: @key })
 
-    conn = conn(:get, "/", payload: payload, source: "auctionet_admin_sso")
+    conn = conn(:get, "/", jwt_authentication_token: payload)
       |> set_up_session
 
     assert_raise RuntimeError, ~r/too old/, fn ->

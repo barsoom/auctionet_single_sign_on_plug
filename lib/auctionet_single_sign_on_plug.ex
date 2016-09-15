@@ -17,7 +17,7 @@ defmodule AuctionetSingleSignOnPlug do
   end
 
   def call(conn, options) do
-    if auctionet_admin_sso_request?(conn) do
+    if sso_request?(conn) do
       parse_sso_data(conn, options)
       |> respond_to_sso(conn, options)
     else
@@ -26,33 +26,20 @@ defmodule AuctionetSingleSignOnPlug do
     end
   end
 
-  defp auctionet_admin_sso_request?(conn) do
+  defp sso_request?(conn) do
     conn.params != %Plug.Conn.Unfetched{aspect: :params} &&
-      conn.params["source"] == "auctionet_admin_sso"
+      conn.params["jwt_authentication_token"]
   end
 
-  defp parse_sso_data(%{ params: %{ "payload" => payload } }, options) do
+  defp parse_sso_data(%{ params: %{ "jwt_authentication_token" => token } }, options) do
     sso_secret_key = options[:sso_secret_key]
-    {:ok, data} = JsonWebToken.verify(payload, %{ key: sso_secret_key })
+    {:ok, data} = JsonWebToken.verify(token, %{ key: sso_secret_key })
 
     if :os.system_time(:seconds) > data.exp do
       raise "Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data."
     end
 
-    if data[:protocol_version] == 2 do
-      data
-    else
-      payload = data.payload
-
-      %{
-        action: payload.action,
-        protocol_version: 2,
-        user: Map.merge(payload.profile, %{
-          active_session_ids: payload.known_session_ids,
-          session_id: payload.session_id,
-        })
-      }
-    end
+    data
   end
 
   defp respond_to_sso(data, conn, options) do
