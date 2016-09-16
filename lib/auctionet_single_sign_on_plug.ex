@@ -62,7 +62,7 @@ defmodule AuctionetSingleSignOnPlug do
         sso_employee_id = user.external_id
         active_sso_session_ids = user.active_session_ids
 
-        options[:sso_session_persister].update_if_exists(sso_employee_id, active_sso_session_ids, user)
+        options[:sso_session_persister].update_if_exists(sso_employee_id, active_sso_session_ids, data)
 
         conn
         |> Plug.Conn.resp(200, "ok")
