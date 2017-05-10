@@ -54,7 +54,7 @@ defmodule AuctionetSingleSignOnPlug do
       conn
       |> put_session(:sso_session_id, user.session_id)
       |> put_session(:sso_employee_id, sso_employee_id)
-      |> Plug.Conn.put_resp_header("location", "/")
+      |> Plug.Conn.put_resp_header("location", get_session(conn, :sso_requested_path) || "/")
       |> Plug.Conn.resp(302, "Logged in")
       |> Plug.Conn.halt
     else
@@ -85,6 +85,7 @@ defmodule AuctionetSingleSignOnPlug do
       conn
       |> put_session(:sso_session_id, nil)
       |> put_session(:sso_employee_id, nil)
+      |> put_session(:sso_requested_path, conn.request_path)
       |> Plug.Conn.put_resp_header("location", options[:sso_request_url])
       |> Plug.Conn.resp(302, "Requesting SSO")
       |> Plug.Conn.halt

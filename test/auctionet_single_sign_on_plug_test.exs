@@ -12,9 +12,7 @@ defmodule AuctionetSingleSignOnPlugTest do
   )
 
   test "a log_in event persists the session and redirects" do
-    unix_time = :os.system_time(:seconds)
-    user = %{ external_id: 100, active_session_ids: [ "abc123" ], session_id: "abc123", action: "log_in" }
-    token = JsonWebToken.sign(%{ action: "log_in", user: user, protocol_version: 3, exp: unix_time + 2 }, %{ key: @key })
+    token = build_valid_login_token(session_id: "abc123", external_id: 100)
 
     conn = conn(:get, "/", jwt_authentication_token: token)
       |> set_up_session
@@ -120,6 +118,26 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert get_session(conn, :sso_employee_id) == nil
   end
 
+  test "the requested URL is retained in session and redirected to after login" do
+    # Try to visit an URL and get redirected for SSO
+    conn = conn(:get, "/admin/items/5") |> set_up_session
+    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    assert conn.status == 302 # redirect
+    requested_path_stored_in_session = get_session(conn, :sso_requested_path)
+
+    # Later we come back with a SSO login, the only shared data is the sso_requested_path in session
+    token = build_valid_login_token(session_id: "test", external_id: 1)
+    conn = conn(:get, "/", jwt_authentication_token: token)
+      |> set_up_session
+      |> put_session(:sso_requested_path, requested_path_stored_in_session)
+
+    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+
+    assert get_session(conn, :sso_session_id) == "test"
+    redirect_location = conn.resp_headers |> Enum.into(%{}) |> Map.get("location")
+    assert redirect_location == "/admin/items/5"
+  end
+
   test "throws an error if the data is expired" do
     unix_time = :os.system_time(:seconds)
     payload = JsonWebToken.sign(%{ payload: %{ app: "data" }, exp: unix_time - 1 }, %{ key: @key })
@@ -130,6 +148,12 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert_raise RuntimeError, ~r/too old/, fn ->
       AuctionetSingleSignOnPlug.call(conn, @opts)
     end
+  end
+
+  defp build_valid_login_token(session_id: session_id, external_id: external_id) do
+    unix_time = :os.system_time(:seconds)
+    user = %{ external_id: external_id, active_session_ids: [ session_id ], session_id: session_id, action: "log_in" }
+    JsonWebToken.sign(%{ action: "log_in", user: user, protocol_version: 3, exp: unix_time + 2 }, %{ key: @key })
   end
 
   defp set_up_session(conn) do
