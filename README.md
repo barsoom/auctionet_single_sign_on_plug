@@ -70,7 +70,7 @@ Start `foreman start -f Procfile.sso` and `dev web` in /projects/auctionet.
 
 Visit the app in development and see if it authenticates with auctionet.dev.
 
-If it works you will be returned to "/" on your app rendered by `PageController`. This means you're authenticated. Check `conn.assigns[:sso]` for user data!
+If it works you will be returned to the path you requested on your app. This means you're authenticated. Check `conn.assigns[:sso]` for user data!
 
 Logging out from <http://auctionet.dev/admin> should log you out from the app (a background job in auctionet makes a call to the app in the background). Going to the app and logging in again should return you to the app with `conn.assigns[:sso]` set.
 
