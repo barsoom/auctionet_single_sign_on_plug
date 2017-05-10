@@ -28,7 +28,7 @@ defmodule AuctionetSingleSignOnPlug.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:cowboy, "~> 1.0.0"},
+      {:cowboy, "~> 1.0"},
       {:plug, "~> 1.0"},
       {:json_web_token, "~> 0.2"},
     ]
