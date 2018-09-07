@@ -22,13 +22,15 @@ defmodule AuctionetSingleSignOnPlug do
         sso_session_persister: sso_session_persister
       ) do
     []
-    |> Keyword.put(:sso_secret_key, sso_secret_key |> read_application_env)
-    |> Keyword.put(:sso_request_url, sso_request_url |> read_application_env)
+    |> Keyword.put(:unresolved_sso_secret_key, sso_secret_key)
+    |> Keyword.put(:unresolved_sso_request_url, sso_request_url)
     |> Keyword.put(:sso_session_persister, sso_session_persister)
     |> IO.inspect()
   end
 
   def call(conn, options) do
+    options = resolve_sso_config(options)
+
     if sso_request?(conn) do
       parse_sso_data(conn, options)
       |> respond_to_sso(conn, options)
@@ -111,6 +113,12 @@ defmodule AuctionetSingleSignOnPlug do
       |> Plug.Conn.resp(302, "Requesting SSO")
       |> Plug.Conn.halt()
     end
+  end
+
+  defp resolve_sso_config(config) do
+    config
+    |> Keyword.put(:sso_secret_key, config[:unresolved_sso_secret_key] |> read_application_env)
+    |> Keyword.put(:sso_request_url, config[:unresolved_sso_request_url] |> read_application_env)
   end
 
   defp read_application_env({:application_env, scope, name}) do
