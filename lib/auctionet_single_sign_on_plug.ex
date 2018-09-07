@@ -25,6 +25,7 @@ defmodule AuctionetSingleSignOnPlug do
     |> Keyword.put(:sso_secret_key, sso_secret_key |> read_application_env)
     |> Keyword.put(:sso_request_url, sso_request_url |> read_application_env)
     |> Keyword.put(:sso_session_persister, sso_session_persister)
+    |> IO.inspect()
   end
 
   def call(conn, options) do
