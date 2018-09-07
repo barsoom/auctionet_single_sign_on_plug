@@ -1,0 +1,4 @@
+# Needed to be able to run tests in devbox.
+dependencies:
+  elixir: "1.7.3"
+  erlang: "21.0"

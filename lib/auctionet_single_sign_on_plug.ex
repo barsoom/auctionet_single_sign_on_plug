@@ -13,7 +13,7 @@ defmodule AuctionetSingleSignOnPlug do
     |> Keyword.put(
       :sso_session_persister,
       options[:sso_session_persister] || AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory
-      )
+    )
   end
 
   def call(conn, options) do
@@ -31,9 +31,9 @@ defmodule AuctionetSingleSignOnPlug do
       conn.params["jwt_authentication_token"]
   end
 
-  defp parse_sso_data(%{ params: %{ "jwt_authentication_token" => token } }, options) do
+  defp parse_sso_data(%{params: %{"jwt_authentication_token" => token}}, options) do
     sso_secret_key = options[:sso_secret_key]
-    {:ok, data} = JsonWebToken.verify(token, %{ key: sso_secret_key })
+    {:ok, data} = JsonWebToken.verify(token, %{key: sso_secret_key})
 
     if :os.system_time(:seconds) > data.exp do
       raise "Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data."
@@ -49,24 +49,32 @@ defmodule AuctionetSingleSignOnPlug do
       sso_employee_id = user.external_id
       active_sso_session_ids = user.active_session_ids
 
-      options[:sso_session_persister].create_or_update(sso_employee_id, active_sso_session_ids, data)
+      options[:sso_session_persister].create_or_update(
+        sso_employee_id,
+        active_sso_session_ids,
+        data
+      )
 
       conn
       |> put_session(:sso_session_id, user.session_id)
       |> put_session(:sso_employee_id, sso_employee_id)
       |> Plug.Conn.put_resp_header("location", get_session(conn, :sso_requested_path) || "/")
       |> Plug.Conn.resp(302, "Logged in")
-      |> Plug.Conn.halt
+      |> Plug.Conn.halt()
     else
       if data[:action] == "update" do
         sso_employee_id = user.external_id
         active_sso_session_ids = user.active_session_ids
 
-        options[:sso_session_persister].update_if_exists(sso_employee_id, active_sso_session_ids, data)
+        options[:sso_session_persister].update_if_exists(
+          sso_employee_id,
+          active_sso_session_ids,
+          data
+        )
 
         conn
         |> Plug.Conn.resp(200, "ok")
-        |> Plug.Conn.halt
+        |> Plug.Conn.halt()
       else
         raise "Unknown action: #{data[:action]}"
       end
@@ -77,7 +85,8 @@ defmodule AuctionetSingleSignOnPlug do
     sso_session_id = get_session(conn, :sso_session_id)
     sso_employee_id = get_session(conn, :sso_employee_id)
 
-    {active_sso_session_ids, custom_data} = options[:sso_session_persister].active_sso_session_ids_and_data(sso_employee_id)
+    {active_sso_session_ids, custom_data} =
+      options[:sso_session_persister].active_sso_session_ids_and_data(sso_employee_id)
 
     if sso_session_id in active_sso_session_ids do
       assign(conn, :sso, custom_data)
@@ -88,7 +97,7 @@ defmodule AuctionetSingleSignOnPlug do
       |> put_session(:sso_requested_path, conn.request_path)
       |> Plug.Conn.put_resp_header("location", options[:sso_request_url])
       |> Plug.Conn.resp(302, "Requesting SSO")
-      |> Plug.Conn.halt
+      |> Plug.Conn.halt()
     end
   end
 end
