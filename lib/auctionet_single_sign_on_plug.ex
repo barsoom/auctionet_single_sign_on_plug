@@ -8,12 +8,23 @@ defmodule AuctionetSingleSignOnPlug do
   #
   # This is because there is no need to persist anything but active_sso_session_ids.
 
-  def init(options) do
-    options
-    |> Keyword.put(
-      :sso_session_persister,
-      options[:sso_session_persister] || AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory
+  def init(sso_secret_key: sso_secret_key, sso_request_url: sso_request_url) do
+    init(
+      sso_secret_key: sso_secret_key,
+      sso_request_url: sso_request_url,
+      sso_session_persister: AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory
     )
+  end
+
+  def init(
+        sso_secret_key: sso_secret_key,
+        sso_request_url: sso_request_url,
+        sso_session_persister: sso_session_persister
+      ) do
+    []
+    |> Keyword.put(:sso_secret_key, sso_secret_key |> read_application_env)
+    |> Keyword.put(:sso_request_url, sso_request_url |> read_application_env)
+    |> Keyword.put(:sso_session_persister, sso_session_persister)
   end
 
   def call(conn, options) do
@@ -99,5 +110,9 @@ defmodule AuctionetSingleSignOnPlug do
       |> Plug.Conn.resp(302, "Requesting SSO")
       |> Plug.Conn.halt()
     end
+  end
+
+  defp read_application_env({:application_env, scope, name}) do
+    Application.get_env(scope, name)
   end
 end

@@ -3,22 +3,27 @@ defmodule AuctionetSingleSignOnPlugTest do
   use Plug.Test
 
   @key "1122334455667788990011223344556677889900"
-  @opts AuctionetSingleSignOnPlug.init(sso_secret_key: @key, sso_request_url: "sso-request-url")
+
   @session Plug.Session.init(
              store: :cookie,
              key: "_app",
              encryption_salt: "salt",
              signing_salt: "salt"
            )
+  setup do
+    Application.put_env(:auctionet_single_sign_on_plug, :sso_secret_key, @key)
+    Application.put_env(:auctionet_single_sign_on_plug, :sso_request_url, "sso-request-url")
+  end
 
   test "a log_in event persists the session and redirects" do
+    opts = init_plug()
     token = build_valid_login_token(session_id: "abc123", external_id: 100)
 
     conn =
       conn(:get, "/", jwt_authentication_token: token)
       |> set_up_session
 
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
 
     # redirect
     assert conn.status == 302
@@ -32,6 +37,7 @@ defmodule AuctionetSingleSignOnPlugTest do
   end
 
   test "a update event persists the session change and responds with an ok" do
+    opts = init_plug()
     unix_time = :os.system_time(:seconds)
 
     user = %{
@@ -53,7 +59,7 @@ defmodule AuctionetSingleSignOnPlugTest do
 
     AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory.create_or_update(100, ["abc123"], %{})
 
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
 
     assert conn.status == 200
     assert conn.resp_body == "ok"
@@ -65,6 +71,7 @@ defmodule AuctionetSingleSignOnPlugTest do
   end
 
   test "a unknown event raises an error" do
+    opts = init_plug()
     unix_time = :os.system_time(:seconds)
 
     token =
@@ -77,11 +84,13 @@ defmodule AuctionetSingleSignOnPlugTest do
       |> set_up_session
 
     assert_raise RuntimeError, ~r/Unknown action: jump/, fn ->
-      AuctionetSingleSignOnPlug.call(conn, @opts)
+      AuctionetSingleSignOnPlug.call(conn, opts)
     end
   end
 
   test "a regular page load assigns data based on sso_employee_id" do
+    opts = init_plug()
+
     conn =
       conn(:get, "/")
       |> set_up_session
@@ -92,7 +101,7 @@ defmodule AuctionetSingleSignOnPlugTest do
       some: "data"
     })
 
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
 
     assert conn.assigns[:sso] == %{some: "data"}
     assert get_session(conn, :sso_session_id) == "abc123"
@@ -100,6 +109,8 @@ defmodule AuctionetSingleSignOnPlugTest do
   end
 
   test "a regular page load clears everything and requests a new sso session when the old one is invalid" do
+    opts = init_plug()
+
     conn =
       conn(:get, "/")
       |> set_up_session
@@ -108,7 +119,7 @@ defmodule AuctionetSingleSignOnPlugTest do
 
     AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory.create_or_update(100, ["ddd555"], %{})
 
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
 
     # redirect
     assert conn.status == 302
@@ -118,6 +129,8 @@ defmodule AuctionetSingleSignOnPlugTest do
   end
 
   test "a regular page load clears everything and requests a new sso session if session info was lost" do
+    opts = init_plug()
+
     conn =
       conn(:get, "/")
       |> set_up_session
@@ -126,7 +139,7 @@ defmodule AuctionetSingleSignOnPlugTest do
 
     # cookies exist, but no state (e.g. after server restart)
 
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
 
     # redirect
     assert conn.status == 302
@@ -136,11 +149,13 @@ defmodule AuctionetSingleSignOnPlugTest do
   end
 
   test "a regular page requests a sso session when none exists" do
+    opts = init_plug()
+
     conn =
       conn(:get, "/")
       |> set_up_session
 
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
 
     # redirect
     assert conn.status == 302
@@ -150,9 +165,12 @@ defmodule AuctionetSingleSignOnPlugTest do
   end
 
   test "the requested URL is retained in session and redirected to after login" do
+    opts = init_plug()
+
     # Try to visit an URL and get redirected for SSO
     conn = conn(:get, "/admin/items/5") |> set_up_session
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
+
     # redirect
     assert conn.status == 302
     requested_path_stored_in_session = get_session(conn, :sso_requested_path)
@@ -165,7 +183,7 @@ defmodule AuctionetSingleSignOnPlugTest do
       |> set_up_session
       |> put_session(:sso_requested_path, requested_path_stored_in_session)
 
-    conn = AuctionetSingleSignOnPlug.call(conn, @opts)
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
 
     assert get_session(conn, :sso_session_id) == "test"
     redirect_location = conn.resp_headers |> Enum.into(%{}) |> Map.get("location")
@@ -173,6 +191,7 @@ defmodule AuctionetSingleSignOnPlugTest do
   end
 
   test "throws an error if the data is expired" do
+    opts = init_plug()
     unix_time = :os.system_time(:seconds)
     payload = JsonWebToken.sign(%{payload: %{app: "data"}, exp: unix_time - 1}, %{key: @key})
 
@@ -181,8 +200,15 @@ defmodule AuctionetSingleSignOnPlugTest do
       |> set_up_session
 
     assert_raise RuntimeError, ~r/too old/, fn ->
-      AuctionetSingleSignOnPlug.call(conn, @opts)
+      AuctionetSingleSignOnPlug.call(conn, opts)
     end
+  end
+
+  defp init_plug() do
+    AuctionetSingleSignOnPlug.init(
+      sso_secret_key: {:application_env, :auctionet_single_sign_on_plug, :sso_secret_key},
+      sso_request_url: {:application_env, :auctionet_single_sign_on_plug, :sso_request_url}
+    )
   end
 
   defp build_valid_login_token(session_id: session_id, external_id: external_id) do
