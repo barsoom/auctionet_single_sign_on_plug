@@ -25,7 +25,6 @@ defmodule AuctionetSingleSignOnPlug do
     |> Keyword.put(:unresolved_sso_secret_key, sso_secret_key)
     |> Keyword.put(:unresolved_sso_request_url, sso_request_url)
     |> Keyword.put(:sso_session_persister, sso_session_persister)
-    |> IO.inspect()
   end
 
   def call(conn, options) do
