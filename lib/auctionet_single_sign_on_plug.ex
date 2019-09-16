@@ -62,7 +62,7 @@ defmodule AuctionetSingleSignOnPlug do
     end
 
     conn
-    |> respond_to_other(options)
+    |> respond_to_other(options, "/")
   end
 
   defp respond_to_sso({data, false = _expired}, conn, options) do
@@ -104,7 +104,7 @@ defmodule AuctionetSingleSignOnPlug do
     end
   end
 
-  defp respond_to_other(conn, options) do
+  defp respond_to_other(conn, options, request_path \\ nil) do
     sso_session_id = get_session(conn, :sso_session_id)
     sso_employee_id = get_session(conn, :sso_employee_id)
 
@@ -117,7 +117,7 @@ defmodule AuctionetSingleSignOnPlug do
       conn
       |> put_session(:sso_session_id, nil)
       |> put_session(:sso_employee_id, nil)
-      |> put_session(:sso_requested_path, conn.request_path)
+      |> put_session(:sso_requested_path, request_path || conn.request_path)
       |> Plug.Conn.put_resp_header("location", options[:sso_request_url])
       |> Plug.Conn.resp(302, "Requesting SSO")
       |> Plug.Conn.halt()
