@@ -48,14 +48,24 @@ defmodule AuctionetSingleSignOnPlug do
     sso_secret_key = options[:sso_secret_key]
     {:ok, data} = JsonWebToken.verify(token, %{key: sso_secret_key})
 
-    if :os.system_time(:seconds) > data.exp do
-      raise "Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data."
-    end
-
-    data
+    {data, :os.system_time(:seconds) > data.exp}
   end
 
-  defp respond_to_sso(data, conn, options) do
+  defp respond_to_sso({data, true = _expired}, conn, options) do
+    log_message =
+      "AuctionetSingleSignOnPlug: Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data. System time: #{
+        :os.system_time(:seconds)
+      }.  Data: #{inspect(data)}. Redirected user to login."
+
+    if Mix.env() != :test do
+      IO.puts(log_message)
+    end
+
+    conn
+    |> respond_to_other(options)
+  end
+
+  defp respond_to_sso({data, false = _expired}, conn, options) do
     user = data.user
 
     if data[:action] == "log_in" do

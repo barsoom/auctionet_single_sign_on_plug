@@ -190,7 +190,7 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert redirect_location == "/admin/items/5"
   end
 
-  test "throws an error if the data is expired" do
+  test "request a new sso session if the data is expired" do
     opts = init_plug()
     unix_time = :os.system_time(:seconds)
     payload = JsonWebToken.sign(%{payload: %{app: "data"}, exp: unix_time - 1}, %{key: @key})
@@ -199,9 +199,13 @@ defmodule AuctionetSingleSignOnPlugTest do
       conn(:get, "/", jwt_authentication_token: payload)
       |> set_up_session
 
-    assert_raise RuntimeError, ~r/too old/, fn ->
-      AuctionetSingleSignOnPlug.call(conn, opts)
-    end
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
+
+    # redirect
+    assert conn.status == 302
+    assert conn.assigns[:sso] == nil
+    assert get_session(conn, :sso_session_id) == nil
+    assert get_session(conn, :sso_employee_id) == nil
   end
 
   defp init_plug() do
