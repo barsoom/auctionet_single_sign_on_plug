@@ -1,4 +1,5 @@
 # Needed to be able to run tests in devbox.
 dependencies:
+  # If you change this also update Dockerfile
   elixir: "1.7.3"
   erlang: "21.0"

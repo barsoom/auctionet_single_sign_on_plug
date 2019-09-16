@@ -110,10 +110,14 @@ Add the SSO header [like in the example app](https://github.com/barsoom/phoenix_
 
 Done!
 
-## Developing this plug
+## Developing this plug (devbox)
 
     mix deps.get
     mix test
+
+## Developing this plug (docker)
+
+    make test
 
 ### More info
 
