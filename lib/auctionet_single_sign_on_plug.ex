@@ -55,7 +55,7 @@ defmodule AuctionetSingleSignOnPlug do
     log_message =
       "AuctionetSingleSignOnPlug: Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data. System time: #{
         :os.system_time(:seconds)
-      }.  Data: #{inspect(data)}. Redirected user to login."
+      }. Expiration time: #{inspect(data.exp)}. Redirected user to login."
 
     if Mix.env() != :test do
       IO.puts(log_message)
