@@ -62,7 +62,9 @@ defmodule AuctionetSingleSignOnPlug do
     end
 
     conn
-    |> respond_to_other(options)
+    |> Plug.Conn.put_resp_header("location", get_session(conn, :sso_requested_path) || "/")
+    |> Plug.Conn.resp(302, "Token not valid. Try again.")
+    |> Plug.Conn.halt()
   end
 
   defp respond_to_sso({data, false = _expired}, conn, options) do

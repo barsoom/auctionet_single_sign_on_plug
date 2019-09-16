@@ -198,6 +198,7 @@ defmodule AuctionetSingleSignOnPlugTest do
     conn =
       conn(:get, "/", jwt_authentication_token: payload)
       |> set_up_session
+      |> put_session(:sso_requested_path, "/foo")
 
     conn = AuctionetSingleSignOnPlug.call(conn, opts)
 
@@ -206,6 +207,8 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert conn.assigns[:sso] == nil
     assert get_session(conn, :sso_session_id) == nil
     assert get_session(conn, :sso_employee_id) == nil
+    redirect_location = conn.resp_headers |> Enum.into(%{}) |> Map.get("location")
+    assert redirect_location == "/foo"
   end
 
   defp init_plug() do
