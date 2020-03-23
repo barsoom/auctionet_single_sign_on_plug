@@ -38,8 +38,13 @@ defmodule AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory do
     if pid do
       pid
     else
-      {:ok, pid} = Agent.start_link(fn -> %{} end, name: __MODULE__)
-      pid
+      case Agent.start_link(fn -> %{} end, name: __MODULE__) do
+        {:ok, pid} ->
+          pid
+
+        {:error, {:already_started, pid}} ->
+          pid
+      end
     end
   end
 end
