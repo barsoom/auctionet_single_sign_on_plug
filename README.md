@@ -16,7 +16,7 @@ Add this to deps:
 
 And below add this (will be needed later):
 
-```
+```elixir
   defp github_url(path) do
     if System.get_env("MIX_ENV") == "prod" do
       "https://github.com/#{path}.git"
@@ -32,7 +32,7 @@ Run `mix deps.get`
 
 Remember to change "your_app_name".
 
-```
+```elixir
 config :your_app_name,
   sso_secret_key: "dev secretdev secretdev secretdev secretdev secretdev secretdev secretdev secretdev secretdev secret",
   sso_request_url: "http://auctionet.dev/admin/login/request_sso?app=your_app_name",
@@ -41,7 +41,7 @@ config :your_app_name,
 
 ### router.ex
 
-```
+```elixir
   pipeline :require_valid_sso_login do
     plug AuctionetSingleSignOnPlug,
       sso_secret_key: Application.get_env(:your_app_name, :sso_secret_key),
@@ -91,7 +91,7 @@ Since this is a private project it's more complex to access. Circle has a way to
 
 ### prod.exs
 
-```
+```elixir
 config :your_app_name,
   sso_secret_key: System.get_env("SSO_SECRET_KEY"),
   sso_request_url: System.get_env("SSO_REQUEST_URL"),
