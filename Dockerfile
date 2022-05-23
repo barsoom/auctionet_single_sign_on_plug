@@ -1,5 +1,5 @@
 # If you change this also update dev.yml
-FROM hexpm/elixir:1.10.1-erlang-22.2.7-alpine-3.11.3
+FROM hexpm/elixir:1.13.4-erlang-24.3.4-alpine-3.15.3
 
 RUN mix local.hex --force && mix local.rebar --force
 WORKDIR /app
