@@ -2,4 +2,4 @@
 dependencies:
   # If you change this also update Dockerfile
   elixir: "1.13.4"
-  erlang: "24.3.4"
+  erlang: "25.0"
