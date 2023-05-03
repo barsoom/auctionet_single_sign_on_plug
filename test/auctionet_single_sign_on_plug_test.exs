@@ -47,11 +47,7 @@ defmodule AuctionetSingleSignOnPlugTest do
       external_id: 100
     }
 
-    token =
-      JsonWebToken.sign(
-        %{action: "update", protocol_version: 3, user: user, exp: unix_time + 2},
-        %{key: @key}
-      )
+    {:ok, token} = Joken.Signer.sign(%{action: "update", protocol_version: 3, user: user, exp: unix_time + 2}, Joken.Signer.create("HS256", @key))
 
     conn =
       conn(:get, "/", jwt_authentication_token: token)
@@ -74,10 +70,7 @@ defmodule AuctionetSingleSignOnPlugTest do
     opts = init_plug()
     unix_time = :os.system_time(:seconds)
 
-    token =
-      JsonWebToken.sign(%{action: "jump", user: %{}, protocol_version: 3, exp: unix_time + 2}, %{
-        key: @key
-      })
+    {:ok, token} = Joken.Signer.sign(%{action: "jump", user: %{}, protocol_version: 3, exp: unix_time + 2}, Joken.Signer.create("HS256", @key))
 
     conn =
       conn(:get, "/", jwt_authentication_token: token)
@@ -193,10 +186,11 @@ defmodule AuctionetSingleSignOnPlugTest do
   test "request a new sso session if the data is expired" do
     opts = init_plug()
     unix_time = :os.system_time(:seconds)
-    payload = JsonWebToken.sign(%{payload: %{app: "data"}, exp: unix_time - 1}, %{key: @key})
+
+    {:ok, token} = Joken.Signer.sign(%{payload: %{app: "data"}, exp: unix_time - 1}, Joken.Signer.create("HS256", @key))
 
     conn =
-      conn(:get, "/", jwt_authentication_token: payload)
+      conn(:get, "/", jwt_authentication_token: token)
       |> set_up_session
       |> put_session(:sso_requested_path, "/foo")
 
@@ -227,10 +221,9 @@ defmodule AuctionetSingleSignOnPlugTest do
       session_id: session_id,
       action: "log_in"
     }
+    {:ok, token} = Joken.Signer.sign(%{action: "log_in", user: user, protocol_version: 3, exp: unix_time + 2}, Joken.Signer.create("HS256", @key))
 
-    JsonWebToken.sign(%{action: "log_in", user: user, protocol_version: 3, exp: unix_time + 2}, %{
-      key: @key
-    })
+    token
   end
 
   defp set_up_session(conn) do

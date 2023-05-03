@@ -1,5 +1,6 @@
 defmodule AuctionetSingleSignOnPlug do
   import Plug.Conn
+  use Joken.Config
 
   # sso_session_persister API
   #
@@ -46,12 +47,15 @@ defmodule AuctionetSingleSignOnPlug do
 
   defp parse_sso_data(%{params: %{"jwt_authentication_token" => token}}, options) do
     sso_secret_key = options[:sso_secret_key]
-    {:ok, data} = JsonWebToken.verify(token, %{key: sso_secret_key})
+
+    {:ok, data} = Joken.Signer.verify(token, Joken.Signer.create("HS256", sso_secret_key))
+
+    data = Utils.to_atoms(data)
 
     {data, :os.system_time(:seconds) > data.exp}
   end
 
-  defp respond_to_sso({data, true = _expired}, conn, options) do
+  defp respond_to_sso({data, true = _expired}, conn, _options) do
     log_message =
       "AuctionetSingleSignOnPlug: Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data. System time: #{
         :os.system_time(:seconds)

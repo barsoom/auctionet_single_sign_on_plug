@@ -32,7 +32,7 @@ defmodule AuctionetSingleSignOnPlug.Mixfile do
     [
       {:cowboy, "> 1.0.0"},
       {:plug, "> 1.0.0"},
-      {:json_web_token, "> 0.2.0", git: "https://github.com/Frameio/json_web_token_ex"}
+      {:joken, "~> 2.6"},
     ]
   end
 end
