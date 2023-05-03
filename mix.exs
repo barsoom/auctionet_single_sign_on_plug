@@ -33,6 +33,7 @@ defmodule AuctionetSingleSignOnPlug.Mixfile do
       {:cowboy, "> 1.0.0"},
       {:plug, "> 1.0.0"},
       {:joken, "~> 2.6"},
+      {:jason, "~> 1.3"}
     ]
   end
 end

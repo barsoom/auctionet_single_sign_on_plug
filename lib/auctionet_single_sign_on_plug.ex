@@ -50,7 +50,7 @@ defmodule AuctionetSingleSignOnPlug do
 
     {:ok, data} = Joken.Signer.verify(token, Joken.Signer.create("HS256", sso_secret_key))
 
-    data = Utils.to_atoms(data)
+    data = AuctionetSingleSignOnPlug.Claims.parse(data)
 
     {data, :os.system_time(:seconds) > data.exp}
   end
@@ -74,7 +74,7 @@ defmodule AuctionetSingleSignOnPlug do
   defp respond_to_sso({data, false = _expired}, conn, options) do
     user = data.user
 
-    if data[:action] == "log_in" do
+    if data.action == "log_in" do
       sso_employee_id = user.external_id
       active_sso_session_ids = user.active_session_ids
 
@@ -91,7 +91,7 @@ defmodule AuctionetSingleSignOnPlug do
       |> Plug.Conn.resp(302, "Logged in")
       |> Plug.Conn.halt()
     else
-      if data[:action] == "update" do
+      if data.action == "update" do
         sso_employee_id = user.external_id
         active_sso_session_ids = user.active_session_ids
 
@@ -105,7 +105,7 @@ defmodule AuctionetSingleSignOnPlug do
         |> Plug.Conn.resp(200, "ok")
         |> Plug.Conn.halt()
       else
-        raise "Unknown action: #{data[:action]}"
+        raise "Unknown action: #{data.action}"
       end
     end
   end
