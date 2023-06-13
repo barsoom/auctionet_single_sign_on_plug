@@ -16,7 +16,7 @@ defmodule AuctionetSingleSignOnPlug.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :cowboy, :plug, :joken]]
+    []
   end
 
   # Dependencies can be Hex packages:
@@ -30,7 +30,6 @@ defmodule AuctionetSingleSignOnPlug.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:cowboy, "> 1.0.0"},
       {:plug, "> 1.0.0"},
       {:joken, "~> 2.6"},
       {:jason, "~> 1.3"}
