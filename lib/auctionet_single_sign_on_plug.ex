@@ -1,6 +1,7 @@
 defmodule AuctionetSingleSignOnPlug do
-  import Plug.Conn
   use Joken.Config
+  import Plug.Conn
+  require Logger
 
   # sso_session_persister API
   #
@@ -61,9 +62,7 @@ defmodule AuctionetSingleSignOnPlug do
         :os.system_time(:seconds)
       }. Expiration time: #{inspect(data.exp)}. Redirected user to login."
 
-    if Mix.env() != :test do
-      IO.puts(log_message)
-    end
+    Logger.info(log_message)
 
     conn
     |> Plug.Conn.put_resp_header("location", get_session(conn, :sso_requested_path) || "/")
