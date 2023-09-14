@@ -8,6 +8,8 @@
 # Not recommended for form heavy apps.
 
 defmodule AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory do
+  @behaviour AuctionetSingleSignOnPlug.Persister
+
   def active_sso_session_ids_and_data(nil), do: {[], nil}
 
   def active_sso_session_ids_and_data(sso_employee_id) do
