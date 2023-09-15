@@ -16,7 +16,7 @@ defmodule AuctionetSingleSignOnPlug.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    []
+    [mod: {AuctionetSingleSignOnPlug.Application, []}]
   end
 
   # Dependencies can be Hex packages:

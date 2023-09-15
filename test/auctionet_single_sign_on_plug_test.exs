@@ -13,6 +13,7 @@ defmodule AuctionetSingleSignOnPlugTest do
   setup do
     Application.put_env(:auctionet_single_sign_on_plug, :sso_secret_key, @key)
     Application.put_env(:auctionet_single_sign_on_plug, :sso_request_url, "sso-request-url")
+    AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory.reset()
   end
 
   test "a log_in event persists the session and redirects" do
@@ -47,7 +48,11 @@ defmodule AuctionetSingleSignOnPlugTest do
       external_id: 100
     }
 
-    {:ok, token} = Joken.Signer.sign(%{action: "update", protocol_version: 3, user: user, exp: unix_time + 2}, Joken.Signer.create("HS256", @key))
+    {:ok, token} =
+      Joken.Signer.sign(
+        %{action: "update", protocol_version: 3, user: user, exp: unix_time + 2},
+        Joken.Signer.create("HS256", @key)
+      )
 
     conn =
       conn(:get, "/", jwt_authentication_token: token)
@@ -70,7 +75,11 @@ defmodule AuctionetSingleSignOnPlugTest do
     opts = init_plug()
     unix_time = :os.system_time(:seconds)
 
-    {:ok, token} = Joken.Signer.sign(%{action: "jump", user: %{}, protocol_version: 3, exp: unix_time + 2}, Joken.Signer.create("HS256", @key))
+    {:ok, token} =
+      Joken.Signer.sign(
+        %{action: "jump", user: %{}, protocol_version: 3, exp: unix_time + 2},
+        Joken.Signer.create("HS256", @key)
+      )
 
     conn =
       conn(:get, "/", jwt_authentication_token: token)
@@ -187,7 +196,11 @@ defmodule AuctionetSingleSignOnPlugTest do
     opts = init_plug()
     unix_time = :os.system_time(:seconds)
 
-    {:ok, token} = Joken.Signer.sign(%{payload: %{app: "data"}, exp: unix_time - 1}, Joken.Signer.create("HS256", @key))
+    {:ok, token} =
+      Joken.Signer.sign(
+        %{payload: %{app: "data"}, exp: unix_time - 1},
+        Joken.Signer.create("HS256", @key)
+      )
 
     conn =
       conn(:get, "/", jwt_authentication_token: token)
@@ -221,7 +234,12 @@ defmodule AuctionetSingleSignOnPlugTest do
       session_id: session_id,
       action: "log_in"
     }
-    {:ok, token} = Joken.Signer.sign(%{action: "log_in", user: user, protocol_version: 3, exp: unix_time + 2}, Joken.Signer.create("HS256", @key))
+
+    {:ok, token} =
+      Joken.Signer.sign(
+        %{action: "log_in", user: user, protocol_version: 3, exp: unix_time + 2},
+        Joken.Signer.create("HS256", @key)
+      )
 
     token
   end
