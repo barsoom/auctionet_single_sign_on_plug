@@ -49,18 +49,20 @@ defmodule AuctionetSingleSignOnPlug do
   defp parse_sso_data(%{params: %{"jwt_authentication_token" => token}}, options) do
     sso_secret_key = options[:sso_secret_key]
 
-    {:ok, data} = Joken.Signer.verify(token, Joken.Signer.create("HS256", sso_secret_key))
+    case Joken.Signer.verify(token, Joken.Signer.create("HS256", sso_secret_key)) do
+      {:ok, data} ->
+        data = AuctionetSingleSignOnPlug.Claims.parse(data)
 
-    data = AuctionetSingleSignOnPlug.Claims.parse(data)
+        {:ok, data, :os.system_time(:seconds) > data.exp}
 
-    {data, :os.system_time(:seconds) > data.exp}
+      error ->
+        error
+    end
   end
 
-  defp respond_to_sso({data, true = _expired}, conn, _options) do
+  defp respond_to_sso({:ok, data, true = _expired}, conn, _options) do
     log_message =
-      "AuctionetSingleSignOnPlug: Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data. System time: #{
-        :os.system_time(:seconds)
-      }. Expiration time: #{inspect(data.exp)}. Redirected user to login."
+      "AuctionetSingleSignOnPlug: Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data. System time: #{:os.system_time(:seconds)}. Expiration time: #{inspect(data.exp)}. Redirected user to login."
 
     Logger.info(log_message)
 
@@ -70,7 +72,7 @@ defmodule AuctionetSingleSignOnPlug do
     |> Plug.Conn.halt()
   end
 
-  defp respond_to_sso({data, false = _expired}, conn, options) do
+  defp respond_to_sso({:ok, data, false = _expired}, conn, options) do
     user = data.user
 
     if data.action == "log_in" do
@@ -107,6 +109,15 @@ defmodule AuctionetSingleSignOnPlug do
         raise "Unknown action: #{data.action}"
       end
     end
+  end
+
+  defp respond_to_sso({:error, :signature_error}, conn, _options) do
+    Logger.info("SSO token signature error")
+
+    conn
+    |> Plug.Conn.put_resp_header("location", get_session(conn, :sso_requested_path) || "/")
+    |> Plug.Conn.resp(302, "Token not valid. Try again.")
+    |> Plug.Conn.halt()
   end
 
   defp respond_to_other(conn, options) do
