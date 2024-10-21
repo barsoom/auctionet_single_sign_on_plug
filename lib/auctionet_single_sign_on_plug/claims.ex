@@ -15,19 +15,22 @@ defmodule AuctionetSingleSignOnPlug.Claims do
       :active_session_ids,
       :company_slug,
       :email,
-      :entitlements,
       :external_id,
       :locale,
       :name,
-      :session_id
+      :session_id,
+      entitlements: [],
+      scopes: %{}
     ]
 
-    def parse(map) do
+    def parse(nil), do: %__MODULE__{}
+    def parse(map) when is_map(map) do
       %__MODULE__{
         active_session_ids: map["active_session_ids"],
         company_slug: map["company_slug"],
         email: map["email"],
-        entitlements: map["entitlements"],
+        entitlements: Map.get(map, "entitlements", []),
+        scopes: Map.get(map, "scopes", %{}),
         external_id: map["external_id"],
         locale: map["locale"],
         name: map["name"],
