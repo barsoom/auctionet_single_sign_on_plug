@@ -64,7 +64,7 @@ defmodule AuctionetSingleSignOnPlug do
     log_message =
       "AuctionetSingleSignOnPlug: Auctionet SSO token is too old. Possible causes: - The request took to long to run. - The system clock is very out of sync between the servers. - Someone is trying to reuse old authentication data. System time: #{:os.system_time(:seconds)}. Expiration time: #{inspect(data.exp)}. Redirected user to login."
 
-    Logger.info(log_message)
+    Logger.error(log_message)
 
     conn
     |> Plug.Conn.put_resp_header("location", get_session(conn, :sso_requested_path) || "/")
