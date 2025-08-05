@@ -110,6 +110,26 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert get_session(conn, :sso_employee_id) == 100
   end
 
+  test "uses the assign_key option" do
+    opts = init_plug(assign_key: :user)
+
+    conn =
+      conn(:get, "/")
+      |> set_up_session
+      |> put_session(:sso_session_id, "abc123")
+      |> put_session(:sso_employee_id, 100)
+
+    AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory.create_or_update(100, ["abc123"], %{
+      some: "data"
+    })
+
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
+
+    assert conn.assigns[:user] == %{some: "data"}
+    assert get_session(conn, :sso_session_id) == "abc123"
+    assert get_session(conn, :sso_employee_id) == 100
+  end
+
   test "a regular page load clears everything and requests a new sso session when the old one is invalid" do
     opts = init_plug()
 
@@ -218,10 +238,15 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert redirect_location == "/foo"
   end
 
-  defp init_plug() do
+  defp init_plug(opts \\ []) do
     AuctionetSingleSignOnPlug.init(
-      sso_secret_key: {:application_env, :auctionet_single_sign_on_plug, :sso_secret_key},
-      sso_request_url: {:application_env, :auctionet_single_sign_on_plug, :sso_request_url}
+      Keyword.merge(
+        [
+          sso_secret_key: {:application_env, :auctionet_single_sign_on_plug, :sso_secret_key},
+          sso_request_url: {:application_env, :auctionet_single_sign_on_plug, :sso_request_url}
+        ],
+        opts
+      )
     )
   end
 

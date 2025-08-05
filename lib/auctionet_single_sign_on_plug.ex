@@ -15,7 +15,8 @@ defmodule AuctionetSingleSignOnPlug do
       unresolved_sso_secret_key: Keyword.fetch!(opts, :sso_secret_key),
       unresolved_sso_request_url: Keyword.fetch!(opts, :sso_request_url),
       sso_session_persister:
-        Keyword.get(opts, :sso_session_persister, AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory)
+        Keyword.get(opts, :sso_session_persister, AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory),
+      assign_key: Keyword.get(opts, :assign_key, :sso)
     ]
   end
 
@@ -118,7 +119,7 @@ defmodule AuctionetSingleSignOnPlug do
       options[:sso_session_persister].active_sso_session_ids_and_data(sso_employee_id)
 
     if sso_session_id in active_sso_session_ids do
-      assign(conn, :sso, custom_data)
+      assign(conn, Keyword.fetch!(options, :assign_key), custom_data)
     else
       conn
       |> put_session(:sso_session_id, nil)
