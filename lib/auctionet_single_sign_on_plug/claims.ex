@@ -24,6 +24,7 @@ defmodule AuctionetSingleSignOnPlug.Claims do
     ]
 
     def parse(nil), do: %__MODULE__{}
+
     def parse(map) when is_map(map) do
       %__MODULE__{
         active_session_ids: map["active_session_ids"],
