@@ -10,23 +10,13 @@ defmodule AuctionetSingleSignOnPlug do
   #
   # This is because there is no need to persist anything but active_sso_session_ids.
 
-  def init(sso_secret_key: sso_secret_key, sso_request_url: sso_request_url) do
-    init(
-      sso_secret_key: sso_secret_key,
-      sso_request_url: sso_request_url,
-      sso_session_persister: AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory
-    )
-  end
-
-  def init(
-        sso_secret_key: sso_secret_key,
-        sso_request_url: sso_request_url,
-        sso_session_persister: sso_session_persister
-      ) do
-    []
-    |> Keyword.put(:unresolved_sso_secret_key, sso_secret_key)
-    |> Keyword.put(:unresolved_sso_request_url, sso_request_url)
-    |> Keyword.put(:sso_session_persister, sso_session_persister)
+  def init(opts) do
+    [
+      unresolved_sso_secret_key: Keyword.fetch!(opts, :sso_secret_key),
+      unresolved_sso_request_url: Keyword.fetch!(opts, :sso_request_url),
+      sso_session_persister:
+        Keyword.get(opts, :sso_session_persister, AuctionetSingleSignOnPlug.PersistSsoSessionsInMemory)
+    ]
   end
 
   def call(conn, options) do
