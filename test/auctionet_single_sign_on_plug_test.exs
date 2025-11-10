@@ -1,6 +1,7 @@
 defmodule AuctionetSingleSignOnPlugTest do
   use ExUnit.Case, async: true
-  use Plug.Test
+  import Plug.Test
+  import Plug.Conn
 
   @key "1122334455667788990011223344556677889900"
 
