@@ -2,8 +2,6 @@
 
 A library to add user authentication though Auctionet Admin SSO to phoenix apps.
 
-See it in action in the [example app on heroku](https://auctionet-phoenix-sso-example.herokuapp.com).
-
 Update this readme if anything is unclear.
 
 ## How to get started in dev in a phoenix app
@@ -83,12 +81,6 @@ Since this is a private project it's more complex to access. Circle has a way to
 0. Then change from admin to read access again.
 0. Don't trigger the build yet.
 
-## Deploying to heroku
-
-- Set heroku config for `GITHUB_AUTH_TOKEN` (auctionet_push has the right one) and add the [netrc](https://github.com/timshadel/heroku-buildpack-github-netrc) buildpack like this `heroku buildpacks:add -i 1 https://github.com/timshadel/heroku-buildpack-github-netrc.git` (needed to install this plug from a private repo).
-- Set heroku configs for `SSO_SECRET_KEY` (pwgen -n 255), `SSO_REQUEST_URL`, and `SSO_LOGOUT_URL` (see auctionet_push config).
-- In elixir_buildpack.config, add "SSO_SECRET_KEY SSO_REQUEST_URL" to config_vars_to_export, so that it at least has `config_vars_to_export=(SSO_SECRET_KEY SSO_REQUEST_URL)`.
-
 ### prod.exs
 
 ```elixir
@@ -122,5 +114,3 @@ Done!
 ### More info
 
 If something doesn't work, check how it's done in [phoenix_sso_example](https://github.com/barsoom/phoenix_sso_example).
-
-The [example app](https://auctionet-phoenix-sso-example.herokuapp.com) also persists it's sessions as User records in a postgres database. That way sessions remain across app restarts and you can use the User records for other things.
