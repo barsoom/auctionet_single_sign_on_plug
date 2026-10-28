@@ -213,6 +213,16 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert redirect_location == "/admin/items/5"
   end
 
+  test "the query string of the requested URL is retained" do
+    opts = init_plug()
+
+    conn = conn(:get, "/admin/items?page=2&sort=name") |> set_up_session
+    conn = AuctionetSingleSignOnPlug.call(conn, opts)
+
+    assert conn.status == 302
+    assert get_session(conn, :sso_requested_path) == "/admin/items?page=2&sort=name"
+  end
+
   test "request a new sso session if the data is expired" do
     opts = init_plug()
     unix_time = :os.system_time(:seconds)

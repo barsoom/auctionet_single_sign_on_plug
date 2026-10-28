@@ -124,12 +124,15 @@ defmodule AuctionetSingleSignOnPlug do
       conn
       |> put_session(:sso_session_id, nil)
       |> put_session(:sso_employee_id, nil)
-      |> put_session(:sso_requested_path, conn.request_path)
+      |> put_session(:sso_requested_path, requested_path(conn))
       |> Plug.Conn.put_resp_header("location", options[:sso_request_url])
       |> Plug.Conn.resp(302, "Requesting SSO")
       |> Plug.Conn.halt()
     end
   end
+
+  defp requested_path(%{request_path: path, query_string: ""}), do: path
+  defp requested_path(%{request_path: path, query_string: query}), do: path <> "?" <> query
 
   defp resolve_sso_config(config) do
     config
