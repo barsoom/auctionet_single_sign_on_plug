@@ -233,6 +233,17 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert claims.user.external_company_id == 7
   end
 
+  test "decodes JSON null in claims as nil" do
+    token = build_valid_login_token(session_id: "abc", external_id: 1)
+
+    {:ok, claims} =
+      Joken.Signer.verify(token, Joken.Signer.create("HS256", @key))
+
+    claims = put_in(claims, ["user", "external_company_id"], :null)
+    parsed = AuctionetSingleSignOnPlug.Claims.parse(claims)
+    assert parsed.user.external_company_id == nil
+  end
+
   test "request a new sso session if the data is expired" do
     opts = init_plug()
     unix_time = :os.system_time(:seconds)

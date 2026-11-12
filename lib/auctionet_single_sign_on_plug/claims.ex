@@ -2,6 +2,8 @@ defmodule AuctionetSingleSignOnPlug.Claims do
   defstruct [:action, :exp, :protocol_version, :user]
 
   def parse(map) do
+    map = nulls_to_nil(map)
+
     %__MODULE__{
       action: map["action"],
       exp: map["exp"],
@@ -9,6 +11,12 @@ defmodule AuctionetSingleSignOnPlug.Claims do
       user: AuctionetSingleSignOnPlug.Claims.User.parse(map["user"])
     }
   end
+
+  # JOSE decodes with OTP's :json by default, which turns JSON null into :null.
+  defp nulls_to_nil(:null), do: nil
+  defp nulls_to_nil(map) when is_map(map), do: Map.new(map, fn {k, v} -> {k, nulls_to_nil(v)} end)
+  defp nulls_to_nil(list) when is_list(list), do: Enum.map(list, &nulls_to_nil/1)
+  defp nulls_to_nil(other), do: other
 
   defmodule User do
     defstruct [
