@@ -223,6 +223,16 @@ defmodule AuctionetSingleSignOnPlugTest do
     assert get_session(conn, :sso_requested_path) == "/admin/items?page=2&sort=name"
   end
 
+  test "parses external_company_id from the user claims" do
+    claims =
+      AuctionetSingleSignOnPlug.Claims.parse(%{
+        "action" => "log_in",
+        "user" => %{"external_id" => 1, "external_company_id" => 7}
+      })
+
+    assert claims.user.external_company_id == 7
+  end
+
   test "request a new sso session if the data is expired" do
     opts = init_plug()
     unix_time = :os.system_time(:seconds)
