@@ -10,18 +10,8 @@ Update this readme if anything is unclear.
 
 Add this to deps:
 
-     {:auctionet_single_sign_on_plug, ">= 0.0.0", git: github_url("barsoom/auctionet_single_sign_on_plug")},
-
-And below add this (will be needed later):
-
 ```elixir
-  defp github_url(path) do
-    if System.get_env("MIX_ENV") == "prod" do
-      "https://github.com/#{path}.git"
-    else
-      "git@github.com:#{path}"
-    end
-  end
+{:auctionet_single_sign_on_plug, ">= 0.0.0", github: "barsoom/auctionet_single_sign_on_plug"},
 ```
 
 Run `mix deps.get`
@@ -72,14 +62,7 @@ If it works you will be returned to the path you requested on your app. This mea
 
 Logging out from <http://auctionet.dev/admin> should log you out from the app (a background job in auctionet makes a call to the app in the background). Going to the app and logging in again should return you to the app with `conn.assigns[:sso]` set.
 
-## CircleCI
-
-Since this is a private project it's more complex to access. Circle has a way to give access, but as far as I can see that gives access to all __your__ private repos. So better to use that feature on the auctionet-ci user.
-
-0. Give the [auctionet-ci-team](https://github.com/orgs/barsoom/teams/auctionet-ci/repositories) admin access to the app repo and read access to this repo.
-0. Log into github as auctionet-ci (in another browser), go to circle, log in there, go to project settings, checkout ssh keys, authorize and add a key for auctionet-ci.
-0. Then change from admin to read access again.
-0. Don't trigger the build yet.
+## Going to production
 
 ### prod.exs
 
